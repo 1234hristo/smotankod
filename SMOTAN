@@ -1,0 +1,47 @@
+add_action('woocommerce_after_order_notes', 'custom_checkout_field');
+function custom_checkout_field($checkout)
+{
+echo '<div><br></br></div>';
+echo '<div id="custom_checkout_field"><h3>' . __('ID код на клиента') . '</h3>';
+woocommerce_form_field('customised_field_name', array(
+'type' => 'text' ,
+'class' => array(
+'my-field-class form-row-wide'
+) ,
+'required' => true ,
+'placeholder' => __('New Custom Field') ,
+) ,
+$checkout->get_value('customised_field_name'));
+echo '</div>';
+}
+
+
+add_action('woocommerce_checkout_process', 'customised_checkout_field_process');
+function customised_checkout_field_process()
+{
+if (!$_POST['customised_field_name']) wc_add_notice(__('Моля въведете правилен ID Код!') , 'error');
+}
+
+
+add_action('woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta');
+function custom_checkout_field_update_order_meta($order_id)
+{
+if (!empty($_POST['customised_field_name'])) {
+update_post_meta($order_id, 'Some Field',sanitize_text_field($_POST['customised_field_name']));
+}
+}
+
+// SO BASICALLY DO TUK KODA E ZA EDIN INPUT FIELD V CHECKOUT SEKCIQTA, DO TUK DOBRE //
+
+
+add_action( 'woocommerce_email_order_meta', 'add_email_order_meta', 10, 3 );
+function add_email_order_meta( $order_obj, $sent_to_admin, $plain_text ){
+ $customised_field_name1 = get_post_meta( $order_id, 'customised_field_name', true );
+ echo '<h2>Друга информация</h2>
+ <ul>
+ <li><strong>ID код на клиента:</strong> ' . $customised_field_name1 . '</li>
+ </ul>';
+}
+
+
+// A TOQ KOD TUKA SE MUCHA DA NAPRAVQ TAKA CHE DA MI VZEME VALUE-A OT INPUT VIELDA S IME CUSTOMISED_FIELD_NAME I DA GO SLOJA V MAILITE KOITO SE RAZPRASHTAT //
